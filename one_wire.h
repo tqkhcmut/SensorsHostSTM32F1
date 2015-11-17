@@ -43,7 +43,7 @@
 #define TRUE  1
 
 #define ONEWIRE_PORT					GPIOB
-#define ONEWIRE_PIN						GPIO_Pin_12
+#define ONEWIRE_PIN						GPIO_Pin_8
 #define ONEWIRE_OUTPUT_MODE		GPIO_Mode_Out_PP
 #define ONEWIRE_INPUT_MODE		GPIO_Mode_IN_FLOATING
 

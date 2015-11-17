@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifndef SENSORS_DEBUG
+#define SENSORS_DEBUG 1
+#endif // SENSORS_DEBUG
+
 struct SensorData
 {
   float TempC;
@@ -12,6 +16,7 @@ struct SensorData
 
 void Sensors_Init(void);
 void Sensors_Poll(void);
+
 
 extern struct SensorData sensors;
 

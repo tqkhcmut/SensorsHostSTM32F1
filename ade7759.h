@@ -2,7 +2,7 @@
 #define _ADE7759_H
 
 #include <stdint.h>
-#include "spi.h"
+#include "ade7759_spi.h"
 
 #define ADE7759_WAVEFORM  0x01
 #define ADE7759_AENERGY   0x02
@@ -35,9 +35,9 @@
 #define ADE7759_MAX_RX    6
 #define ADE7759_STARTUP_DELAY 1
 
-#define ADE7759_SPI_SLOW        (u32)(300 * 1000)
-#define ADE7759_SPI_BURST       (u32)(1000 * 1000)
-#define ADE7759_SPI_FAST        (u32)(2000 * 1000)
+#define ADE7759_SPI_SLOW        SPI_SPEED_SLOW
+#define ADE7759_SPI_BURST       SPI_SPEED_BURST
+#define ADE7759_SPI_FAST        SPI_SPEED_FAST
 
 #define DRIVER_NAME             "ade7759"
 

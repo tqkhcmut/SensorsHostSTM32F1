@@ -174,9 +174,6 @@
           <name>CCDefines</name>
           <state>STM32F10X_MD</state>
           <state>USE_STDPERIPH_DRIVER</state>
-          <state>HSE_VALUE=16000000</state>
-          <state>USE_HC595</state>
-          <state>LONG_ID</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -1893,21 +1890,6 @@
     </settings>
   </configuration>
   <group>
-    <name>ade7759</name>
-    <file>
-      <name>$PROJ_DIR$\ade7759.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ade7759.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ade7759_spi.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\ade7759_spi.h</name>
-    </file>
-  </group>
-  <group>
     <name>Delay</name>
     <file>
       <name>$PROJ_DIR$\delay.c</name>
@@ -1938,6 +1920,15 @@
     </file>
     <file>
       <name>$PROJ_DIR$\spi.h</name>
+    </file>
+  </group>
+  <group>
+    <name>SenseHostCom</name>
+    <file>
+      <name>$PROJ_DIR$\packet.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\packet.h</name>
     </file>
   </group>
   <group>
