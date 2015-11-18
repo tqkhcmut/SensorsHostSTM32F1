@@ -3,20 +3,7 @@
 
 #define FLASH_WRITE_ADDR ((uint32_t)0x0800FC00)
 
-
-const char * BT_PREFIX_NAME = "VM_S_DIMMER_";
-const char * BT_DEFAULT_PIN = "1234";
-
-#ifdef LONG_ID
-const unsigned char BROADCAST_ID[] = {0xff, 0xff, 0xff, 0xff};
-const unsigned char CONNECT_BOX_ID[] = {0x00, 0x00, 0x00, 0x00};
-const unsigned char DEFAULT_ID[] = {0x00, 0x00, 0x00, 0x01};
-#else
-const unsigned char BROADCAST_ID[] = {0xff};
-const unsigned char CONNECT_BOX_ID[] = {0x00};
-const unsigned char DEFAULT_ID[] = {0x01};
-#endif
-
+struct FlashData __flash_data;
 
 int flash_write_buffer(char * buff, int size)
 {

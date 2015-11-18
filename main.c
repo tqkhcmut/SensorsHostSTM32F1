@@ -34,12 +34,17 @@ void led_toggle(void)
   }
 }
 
+#define BUFFER_SIZE 128
+
 int main()
 {
   RCC_ClocksTypeDef RCC_Clocks;
   GPIO_InitTypeDef GPIO_InitStructure;
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-
+  
+	int rf_len, usart_len;
+	char buff_rf[BUFFER_SIZE];
+	char buff_usart[BUFFER_SIZE];
   
   unsigned int sensors_time_poll = 0, temp_time_poll = 0;
   
@@ -78,9 +83,110 @@ int main()
       Sensors_Poll();
       sensors_time_poll = millis();
     }
-//    Enrf24_write_buff("Hello world.", 12);
-//    Enrf24_flush();
-
+    //    Enrf24_write_buff("Hello world.", 12);
+    //    Enrf24_flush();
+    
+    
+		usart_len = USART1_Available();
+		
+		// usart: for test
+		if (usart_len > 4)
+		{
+			int i;
+			USART1_SendStr("\nUSART1 received packet: \n");
+			USART1_GetData(buff_usart, usart_len);
+			for (i = 0; i < usart_len; i++)
+				USART1_SendByte(buff_usart[i], HEX);
+			USART1_SendChar('\n');
+			if (ThesisProcess(buff_usart, usart_len) == PACKET_OK)
+			{
+				memset(buff_usart, 0, usart_len);
+				USART1_Flush();
+				if (need_to_send)
+				{
+					int i;
+					USART1_sendStr("\nNeed to send packet: ");
+					for (i = 0; i < trans_buff_len; i++)
+					{
+						USART1_sendByte(trans_buff[i], HEX);
+					}
+					USART1_sendStr("\nNeed to send packet length: ");
+					USART1_sendNum(trans_buff_len);
+					USART1_sendStr("\n");
+					trans_buff_len = 0;
+					need_to_send = 0;
+				}
+				USART1_sendStr("\nPacket processed.\n"); 
+			}
+			else if (errn == FLASH_ERROR)
+			{
+				USART1_sendStr("\n");
+				USART1_sendStr(err_msg);
+				USART1_sendStr("\n");
+				LEDs_TurnOn(LED_RUN);
+				for(;;);
+			}
+			else if (errn != PACKET_NOT_ENOUGH_LENGTH)
+			{
+				memset(buff_usart, 0, usart_len);
+				USART1_Flush();
+				USART1_sendStr("Packet processing fail.\n");
+			}
+			
+			USART1_sendStr("\n");
+			USART1_sendStr(err_msg);
+			USART1_sendStr("\n");
+		}
+		
+		if (Enrf24_available(1))
+		{
+			int i;
+			USART1_sendStr("\nRF received packet.\n");
+			RF_GetData(buff_rf, rf_len);
+			for (i = 0; i < rf_len; i++)
+				USART1_sendByte(buff_rf[i], HEX);
+			USART1_sendChar('\n');
+			
+			if (SmartDimmer_ProcessPacket(buff_rf, rf_len) == PACKET_OK)
+			{
+				memset(buff_rf, 0, rf_len);
+				RF_Flush();
+				if (need_to_send)
+				{
+					int i;
+					USART1_sendStr("\nNeed to send packet: ");
+					for (i = 0; i < trans_buff_len; i++)
+					{
+						RF_sendChar(trans_buff[i]);
+						USART1_sendByte(trans_buff[i], HEX);
+					}
+					USART1_sendStr("\nNeed to send packet length: ");
+					USART1_sendNum(trans_buff_len);
+					USART1_sendStr("\n");
+					trans_buff_len = 0;
+					need_to_send = 0;
+				}
+				USART1_sendStr("\nPacket processed.\n");
+			}
+			else if (errn == FLASH_ERROR)
+			{
+				USART1_sendStr("\n");
+				USART1_sendStr(err_msg);
+				USART1_sendStr("\n");
+				LEDs_TurnOn(LED_RUN);
+				for(;;);
+			}
+			else if (errn != PACKET_NOT_ENOUGH_LENGTH)
+			{
+				memset(buff_rf, 0, rf_len);
+				RF_Flush();
+				USART1_sendStr("Packet processing fail.\n");
+			}
+			
+			USART1_sendStr("\n");
+			USART1_sendStr(err_msg);
+			USART1_sendStr("\n");
+		}
 	}
 	
 }

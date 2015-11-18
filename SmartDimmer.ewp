@@ -2144,6 +2144,12 @@
   <file>
     <name>$PROJ_DIR$\main.c</name>
   </file>
+  <file>
+    <name>$PROJ_DIR$\thesis.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\thesis.h</name>
+  </file>
 </project>
 
 
