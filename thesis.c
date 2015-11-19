@@ -6,11 +6,12 @@
 #include <string.h>
 #include <stdio.h>
 
-int thesis_errn;
+int thesis_errn = THESIS_OK;
 char thesis_err_msg[THESIS_MSG_SIZE];
 
-unsigned char thesis_need_to_send;
+unsigned char thesis_need_to_send = 0;
 char thesis_sent_msg[THESIS_MSG_SIZE];
+int thesis_msg_len = 0;
 
 //// my thesis error codes
 //#define THESIS_OK                     1
@@ -112,6 +113,7 @@ int ThesisProcess(char * packet, int len)
         // add return type
         _sent_packet->cmd |= CMD_TYPE_RESPONSE;
         // turn on flag to send back
+				thesis_msg_len = getPacketLength(packet);
         thesis_need_to_send = 1;
         break;
       }

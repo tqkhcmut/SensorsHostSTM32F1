@@ -107,7 +107,7 @@
 
 struct Packet
 {
-  uint8_t len;  // packet length
+//  uint8_t len;  // packet length
 	uint8_t id;	// include type and order in BCD number
   uint8_t unique_number[4];
 	uint8_t cmd;  // include command type and command id

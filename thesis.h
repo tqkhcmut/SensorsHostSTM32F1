@@ -10,6 +10,7 @@
 #define THESIS_PACKET_NOT_ENOUGH_LENGTH   5
 #define THESIS_NOT_OWN_ID             6
 #define THESIS_INVALID_UNIQUE_NUMBER  7
+#define THESIS_FLASH_ERROR						8
 
   
 
@@ -19,7 +20,8 @@ extern int thesis_errn;
 extern char thesis_err_msg[];
 
 extern unsigned char thesis_need_to_send;
-extern char thesis_msg[];
+extern char thesis_sent_msg[];
+extern int thesis_msg_len;
 
 int ThesisProcess(char * packet, int len);
 

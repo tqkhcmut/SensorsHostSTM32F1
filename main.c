@@ -14,6 +14,8 @@
 
 #include "enrf24.h"
 
+#include "thesis.h"
+
 uint8_t enrf24_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x0A };
 
 #define BUFFER_SIZE 128
@@ -98,94 +100,94 @@ int main()
 			for (i = 0; i < usart_len; i++)
 				USART1_SendByte(buff_usart[i], HEX);
 			USART1_SendChar('\n');
-			if (ThesisProcess(buff_usart, usart_len) == PACKET_OK)
+			if (ThesisProcess(buff_usart, usart_len) == THESIS_OK)
 			{
 				memset(buff_usart, 0, usart_len);
 				USART1_Flush();
-				if (need_to_send)
+				if (thesis_need_to_send)
 				{
 					int i;
-					USART1_sendStr("\nNeed to send packet: ");
-					for (i = 0; i < trans_buff_len; i++)
+					USART1_SendStr("\nNeed to send packet: ");
+					for (i = 0; i < thesis_msg_len; i++)
 					{
-						USART1_sendByte(trans_buff[i], HEX);
+						USART1_SendByte(thesis_sent_msg[i], HEX);
 					}
-					USART1_sendStr("\nNeed to send packet length: ");
-					USART1_sendNum(trans_buff_len);
-					USART1_sendStr("\n");
-					trans_buff_len = 0;
-					need_to_send = 0;
+					USART1_SendStr("\nNeed to send packet length: ");
+					USART1_SendNum(thesis_msg_len);
+					USART1_SendStr("\n");
+					thesis_msg_len = 0;
+					thesis_need_to_send = 0;
 				}
-				USART1_sendStr("\nPacket processed.\n"); 
+				USART1_SendStr("\nPacket processed.\n"); 
 			}
-			else if (errn == FLASH_ERROR)
+			else if (thesis_errn == THESIS_FLASH_ERROR)
 			{
-				USART1_sendStr("\n");
-				USART1_sendStr(err_msg);
-				USART1_sendStr("\n");
-				LEDs_TurnOn(LED_RUN);
+				USART1_SendStr("\n");
+				USART1_SendStr(thesis_err_msg);
+				USART1_SendStr("\n");
+				led_toggle();
 				for(;;);
 			}
-			else if (errn != PACKET_NOT_ENOUGH_LENGTH)
+			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
 			{
 				memset(buff_usart, 0, usart_len);
 				USART1_Flush();
-				USART1_sendStr("Packet processing fail.\n");
+				USART1_SendStr("Packet processing fail.\n");
 			}
 			
-			USART1_sendStr("\n");
-			USART1_sendStr(err_msg);
-			USART1_sendStr("\n");
+			USART1_SendStr("\n");
+			USART1_SendStr(thesis_err_msg);
+			USART1_SendStr("\n");
 		}
 		
 		if (Enrf24_available(1))
 		{
 			int i;
-			USART1_sendStr("\nRF received packet.\n");
+			USART1_SendStr("\nRF received packet.\n");
 			RF_GetData(buff_rf, rf_len);
 			for (i = 0; i < rf_len; i++)
-				USART1_sendByte(buff_rf[i], HEX);
-			USART1_sendChar('\n');
+				USART1_SendByte(buff_rf[i], HEX);
+			USART1_SendChar('\n');
 			
-			if (SmartDimmer_ProcessPacket(buff_rf, rf_len) == PACKET_OK)
+			if (ThesisProcess(buff_rf, rf_len) == THESIS_OK)
 			{
 				memset(buff_rf, 0, rf_len);
 				RF_Flush();
-				if (need_to_send)
+				if (thesis_need_to_send)
 				{
 					int i;
-					USART1_sendStr("\nNeed to send packet: ");
-					for (i = 0; i < trans_buff_len; i++)
+					USART1_SendStr("\nNeed to send packet: ");
+					for (i = 0; i < thesis_msg_len; i++)
 					{
-						RF_sendChar(trans_buff[i]);
-						USART1_sendByte(trans_buff[i], HEX);
+						RF_sendChar(thesis_sent_msg[i]);
+						USART1_SendByte(thesis_sent_msg[i], HEX);
 					}
-					USART1_sendStr("\nNeed to send packet length: ");
-					USART1_sendNum(trans_buff_len);
-					USART1_sendStr("\n");
-					trans_buff_len = 0;
-					need_to_send = 0;
+					USART1_SendStr("\nNeed to send packet length: ");
+					USART1_SendNum(thesis_msg_len);
+					USART1_SendStr("\n");
+					thesis_msg_len = 0;
+					thesis_need_to_send = 0;
 				}
-				USART1_sendStr("\nPacket processed.\n");
+				USART1_SendStr("\nPacket processed.\n");
 			}
-			else if (errn == FLASH_ERROR)
+			else if (thesis_errn == THESIS_FLASH_ERROR)
 			{
-				USART1_sendStr("\n");
-				USART1_sendStr(err_msg);
-				USART1_sendStr("\n");
-				LEDs_TurnOn(LED_RUN);
+				USART1_SendStr("\n");
+				USART1_SendStr(thesis_err_msg);
+				USART1_SendStr("\n");
+				led_toggle();
 				for(;;);
 			}
-			else if (errn != PACKET_NOT_ENOUGH_LENGTH)
+			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
 			{
 				memset(buff_rf, 0, rf_len);
 				RF_Flush();
-				USART1_sendStr("Packet processing fail.\n");
+				USART1_SendStr("Packet processing fail.\n");
 			}
 			
-			USART1_sendStr("\n");
-			USART1_sendStr(err_msg);
-			USART1_sendStr("\n");
+			USART1_SendStr("\n");
+			USART1_SendStr(thesis_err_msg);
+			USART1_SendStr("\n");
 		}
 	}
 	
