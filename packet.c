@@ -59,7 +59,7 @@ uint8_t getTypeLength(uint8_t data_type)
 uint8_t getPacketLength(char * packet)
 {
 	struct Packet * mypacket = (struct Packet *)packet;
-  return sizeof(struct Packet) + getTypeLength(mypacket->data_type);
+  return sizeof(struct Packet) + getTypeLength(mypacket->data_type) + 1; // add 1 for checksum
 }
 
 uint8_t checksum(char * packet)

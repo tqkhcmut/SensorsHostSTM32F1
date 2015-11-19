@@ -15,6 +15,8 @@
 #include "enrf24.h"
 
 #include "thesis.h"
+#include "rs485.h"
+#include "output.h"
 
 uint8_t enrf24_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x0A };
 
@@ -36,6 +38,21 @@ void led_toggle(void)
   }
 }
 
+uint8_t buzzer_state = 0;
+void buzzer_toggle(void)
+{
+  if (buzzer_state)
+  {
+    TurnBuzzerOff();
+    buzzer_state = 0;
+  }
+  else
+  {
+    TurnBuzzerOn();
+    buzzer_state = 1;
+  }
+}
+
 #define BUFFER_SIZE 128
 
 int main()
@@ -44,9 +61,10 @@ int main()
   GPIO_InitTypeDef GPIO_InitStructure;
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
   
-	int rf_len, usart_len;
+	int rf_len = 0, usart_len = 0, rs485_len = 0;
 	char buff_rf[BUFFER_SIZE];
 	char buff_usart[BUFFER_SIZE];
+	char buff_rs485[BUFFER_SIZE];
   
   unsigned int sensors_time_poll = 0, temp_time_poll = 0;
   
@@ -55,7 +73,7 @@ int main()
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
   GPIO_WriteBit(GPIOB, GPIO_Pin_9, Bit_SET); // off
-  
+   
 	Delay_Init();
   
   Enrf24_init(CE_PIN, CSN_PIN, IRQ_PIN);
@@ -69,6 +87,15 @@ int main()
 	USART1_Init();
 	DS1307_Init();
   Sensors_Init();
+  RS485_Init();
+  OutputInit();
+  
+  if (ThesisInit() == THESIS_FLASH_ERROR)
+	{
+		USART1_sendStr("\nFlash write error.\n");
+		TurnBuzzerOn();
+		Delay(1000);
+	}
   
 	RCC_GetClocksFreq(&RCC_Clocks);
   USART1_SendStr("System Clock: ");
@@ -84,10 +111,10 @@ int main()
       led_toggle();
       Sensors_Poll();
       sensors_time_poll = millis();
+//      buzzer_toggle();
     }
     //    Enrf24_write_buff("Hello world.", 12);
     //    Enrf24_flush();
-    
     
 		usart_len = USART1_Available();
 		
@@ -140,11 +167,12 @@ int main()
 			USART1_SendStr("\n");
 		}
 		
+    // rf
 		if (Enrf24_available(1))
 		{
 			int i;
 			USART1_SendStr("\nRF received packet.\n");
-			RF_GetData(buff_rf, rf_len);
+			rf_len = Enrf24_read(buff_rf + rf_len, BUFFER_SIZE - 1 - rf_len);
 			for (i = 0; i < rf_len; i++)
 				USART1_SendByte(buff_rf[i], HEX);
 			USART1_SendChar('\n');
@@ -152,14 +180,15 @@ int main()
 			if (ThesisProcess(buff_rf, rf_len) == THESIS_OK)
 			{
 				memset(buff_rf, 0, rf_len);
-				RF_Flush();
+//				RF_Flush();
+        rf_len = 0;
 				if (thesis_need_to_send)
 				{
 					int i;
 					USART1_SendStr("\nNeed to send packet: ");
 					for (i = 0; i < thesis_msg_len; i++)
 					{
-						RF_sendChar(thesis_sent_msg[i]);
+						Enrf24_write(thesis_sent_msg[i]);
 						USART1_SendByte(thesis_sent_msg[i], HEX);
 					}
 					USART1_SendStr("\nNeed to send packet length: ");
@@ -181,7 +210,61 @@ int main()
 			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
 			{
 				memset(buff_rf, 0, rf_len);
-				RF_Flush();
+//				RF_Flush();
+        rf_len = 0;
+				USART1_SendStr("Packet processing fail.\n");
+			}
+			
+			USART1_SendStr("\n");
+			USART1_SendStr(thesis_err_msg);
+			USART1_SendStr("\n");
+		}
+    
+    // rs485
+		rs485_len = RS485_Available();
+		if (rs485_len > 4)
+		{
+			int i;
+			USART1_SendStr("\nUSART1 received packet: \n");
+			RS485_GetData(buff_rs485, rs485_len);
+			for (i = 0; i < rs485_len; i++)
+				USART1_SendByte(buff_usart[i], HEX);
+			USART1_SendChar('\n');
+			if (ThesisProcess(buff_rs485, rs485_len) == THESIS_OK)
+			{
+				memset(buff_rs485, 0, rs485_len);
+				RS485_Flush();
+				if (thesis_need_to_send)
+				{
+					int i;
+					USART1_SendStr("\nNeed to send packet: ");
+          RS485_DIR_Output();
+					for (i = 0; i < thesis_msg_len; i++)
+					{
+						RS485_SendChar(thesis_sent_msg[i]);
+						USART1_SendByte(thesis_sent_msg[i], HEX);
+					}
+          RS485_DIR_Input();
+					USART1_SendStr("\nNeed to send packet length: ");
+					USART1_SendNum(thesis_msg_len);
+					USART1_SendStr("\n");
+					thesis_msg_len = 0;
+					thesis_need_to_send = 0;
+				}
+				USART1_SendStr("\nPacket processed.\n"); 
+			}
+			else if (thesis_errn == THESIS_FLASH_ERROR)
+			{
+				USART1_SendStr("\n");
+				USART1_SendStr(thesis_err_msg);
+				USART1_SendStr("\n");
+				led_toggle();
+				for(;;);
+			}
+			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
+			{
+				memset(buff_rs485, 0, rs485_len);
+				RS485_Flush();
 				USART1_SendStr("Packet processing fail.\n");
 			}
 			

@@ -7,11 +7,11 @@
    
 #include "stm32f10x.h"
 
-void Delay_Init(void);
-void Delay(unsigned int ms_time);
-void DelayUs(unsigned int us_time);
-unsigned int Millis(void);
-unsigned int Micros(void);
+extern void Delay_Init(void);
+extern void Delay(unsigned int ms_time);
+extern inline void DelayUs(unsigned int us_time);
+extern unsigned int Millis(void);
+extern unsigned int Micros(void);
 
 // arduino compatiple
 #define millis                  Millis

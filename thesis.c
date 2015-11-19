@@ -13,11 +13,44 @@ unsigned char thesis_need_to_send = 0;
 char thesis_sent_msg[THESIS_MSG_SIZE];
 int thesis_msg_len = 0;
 
-//// my thesis error codes
-//#define THESIS_OK                     1
-//#define THESIS_PACKET_FAIL            2
-//#define THESIS_PACKET_CHECKSUM_FAIL   3
-//#define THESIS_PACKET_NULL            3
+int IsValidString(char * str, int len)
+{
+  int i = 0;
+  for (i = 0; i < len; i++)
+  {
+    if (str[i] > 'z' || str[i] < '!')
+      return 0;
+  }
+  return i;
+}
+
+int ThesisInit(void)
+{
+  struct Thesis InvalidThesis;
+  memset(&InvalidThesis, 0xff, sizeof (struct Thesis));
+  // restore data saved in flash
+  flash_read_buffer((char *)&__flash_data, sizeof (struct FlashData));
+  if (IS_BROADCAST_ID(__flash_data.id))
+  {
+    // use default id
+    __flash_data.id = Default_id;
+  }
+  if (memcmp(__flash_data.unique_number, InvalidUniqueNumber, 4) == 0)
+  {
+    memcpy(__flash_data.unique_number, Default_UniqueNumber, 4);
+  }
+  if (memcmp(&__flash_data._thesis, &InvalidThesis, sizeof (struct Thesis)) == 0)
+  {
+    __flash_data._thesis._data.Gas = Default_Gas;
+    __flash_data._thesis._data.Lighting = Default_Lighting;
+    __flash_data._thesis._data.TempC = Default_TempC;
+    __flash_data._thesis._output.Buzzer = Default_Buzzer;
+    __flash_data._thesis._output.Relay = Default_Relay;
+    __flash_data._thesis._output.Speaker = Default_Speaker;
+    __flash_data._thesis._time_poll = Default_time_poll;
+    __flash_data._thesis._sim.sms = Default_sms;
+  }
+}
 
 int ThesisProcess(char * packet, int len)
 {

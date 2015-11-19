@@ -21,11 +21,11 @@ unsigned int Millis(void)
   return tick_ms;
 }
 
-void DelayUs(unsigned int time_us)
+inline void DelayUs(unsigned int time_us)
 {
 //  unsigned int tmp_time = 64 * us_time; // old code :)
 //  while(tmp_time--);
-  time_us = time_us * 64 / 5 ;
+  time_us = time_us * 5 ;
   while (time_us--);
 }
 

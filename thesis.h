@@ -23,6 +23,7 @@ extern unsigned char thesis_need_to_send;
 extern char thesis_sent_msg[];
 extern int thesis_msg_len;
 
+int ThesisInit(void);
 int ThesisProcess(char * packet, int len);
 
 #endif // _thesis_h_
