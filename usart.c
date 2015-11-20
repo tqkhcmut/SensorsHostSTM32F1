@@ -5,7 +5,7 @@
 unsigned char usart_rx_buff[USART_BUFF_SIZE];
 unsigned char usart_rx_len;
 
-void USART1_Init(void)
+void USART1_Init(uint32_t baudrate)
 {
   // USART init
   USART_InitTypeDef USART_InitStructure;
@@ -33,7 +33,7 @@ void USART1_Init(void)
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   
-  USART_InitStructure.USART_BaudRate            = 115200;
+  USART_InitStructure.USART_BaudRate            = baudrate;
   USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
   USART_InitStructure.USART_StopBits            = USART_StopBits_1;
   USART_InitStructure.USART_Parity              = USART_Parity_No;

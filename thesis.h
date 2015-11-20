@@ -26,4 +26,6 @@ extern int thesis_msg_len;
 int ThesisInit(void);
 int ThesisProcess(char * packet, int len);
 
+uint16_t RDN(uint16_t start_state);
+
 #endif // _thesis_h_

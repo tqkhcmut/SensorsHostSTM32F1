@@ -22,7 +22,7 @@
 //#define USART_BUFFER_SIZE 	32
 //#define USART_BUFFERED
 
-void USART1_Init(void);
+void USART1_Init(uint32_t baudrate);
 void USART1_SendChar(char c);
 void USART1_SendStr(char Str[]);
 void USART1_SendNum(int num);

@@ -22,7 +22,6 @@ uint8_t enrf24_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x0A };
 
 #define BUFFER_SIZE 128
 
-
 uint8_t led_state = 0;
 void led_toggle(void)
 {
@@ -84,7 +83,7 @@ int main()
   
   Enrf24_enableRX();  // Start listening
 	
-	USART1_Init();
+	USART1_Init(115200);
 	DS1307_Init();
   Sensors_Init();
   RS485_Init();
@@ -92,7 +91,7 @@ int main()
   
   if (ThesisInit() == THESIS_FLASH_ERROR)
 	{
-		USART1_sendStr("\nFlash write error.\n");
+		USART1_SendStr("\nFlash write error.\n");
 		TurnBuzzerOn();
 		Delay(1000);
 	}

@@ -13,6 +13,16 @@ unsigned char thesis_need_to_send = 0;
 char thesis_sent_msg[THESIS_MSG_SIZE];
 int thesis_msg_len = 0;
 
+uint16_t RDN(uint16_t start_state)
+{
+	uint16_t lfsr = start_state;
+	uint16_t bit;                    /* Must be 16bit to allow bit<<15 later in the code */
+  /* taps: 10 7; feedback polynomial: x^10 + x^7 + 1 */
+  bit = ((lfsr >> 0) ^ (lfsr >> 3)) & 1;
+  lfsr = (lfsr >> 1) | (bit << 9);
+	return lfsr;
+}
+
 int IsValidString(char * str, int len)
 {
   int i = 0;
@@ -33,7 +43,7 @@ int ThesisInit(void)
   if (IS_BROADCAST_ID(__flash_data.id))
   {
     // use default id
-    __flash_data.id = Default_id;
+    __flash_data.id = Default_id[0];
   }
   if (memcmp(__flash_data.unique_number, InvalidUniqueNumber, 4) == 0)
   {
@@ -47,9 +57,20 @@ int ThesisInit(void)
     __flash_data._thesis._output.Buzzer = Default_Buzzer;
     __flash_data._thesis._output.Relay = Default_Relay;
     __flash_data._thesis._output.Speaker = Default_Speaker;
-    __flash_data._thesis._time_poll = Default_time_poll;
+    __flash_data._thesis._time_poll.time_poll = Default_time_poll;
     __flash_data._thesis._sim.sms = Default_sms;
+    memset(__flash_data._thesis._sim.sms_msg, 0, 50);
+    memcpy(__flash_data._thesis._sim.sms_msg, Default_sms_msg, strlen(Default_sms_msg));
+    memset(__flash_data._thesis._sim.tar_num, 0, 13);
+    memcpy(__flash_data._thesis._sim.tar_num, Default_tar_num, strlen(Default_tar_num));
+    __flash_data._thesis._sim.tar_num_len = Default_tar_num_len;
   }
+  
+  if (flash_write_buffer((char*)&__flash_data, sizeof(__flash_data)) != 0)
+  {
+    return THESIS_FLASH_ERROR;
+  }
+  return THESIS_OK;
 }
 
 int ThesisProcess(char * packet, int len)

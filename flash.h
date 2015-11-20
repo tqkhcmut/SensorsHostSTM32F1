@@ -17,9 +17,9 @@ struct FlashData
   struct Thesis _thesis;
 };
 
-const char InvalidUniqueNumber[] = {0xff, 0xff, 0xff, 0xff};
-const char Default_UniqueNumber[] = {0x0, 0x0, 0x0, 0x1};
-const char Default_id[] = {DEV_MY_THESIS};
+extern const char InvalidUniqueNumber[];
+extern const char Default_UniqueNumber[];
+extern const char Default_id[];
 
 
 #define Default_TempC    0
