@@ -1,5 +1,6 @@
 #ifndef _thesis_h_
 #define _thesis_h_
+#include <stdint.h>
 
 // my thesis error codes
 #define THESIS_OK                     1

@@ -5,6 +5,9 @@ uint8_t getTypeLength(uint8_t data_type)
 {
 	switch (DATA_TYPE_MASK(data_type))
 	{
+	case DATA_TYPE_NULL:
+		return 0; //sizeof(uint8_t);
+		break;
 	case DATA_TYPE_BYTE:
 		return 1; //sizeof(uint8_t);
 		break;
@@ -64,9 +67,9 @@ uint8_t getPacketLength(char * packet)
 
 uint8_t checksum(char * packet)
 {
-	uint8_t checksum, i;
+	uint8_t checksum = 0, i = 0;
 //	packet_len = getTypeLength(mypacket->data_type) + 3;
-	for (i = 0; i < getPacketLength(packet); i++)
+	for (i = 0; i < getPacketLength(packet) - 1; i++) // except checksum byte
 		checksum += packet[i];
 	checksum = !checksum + 1;
 	return checksum;

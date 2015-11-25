@@ -92,10 +92,12 @@ int ThesisProcess(char * packet, int len)
     return thesis_errn;
   }
   
-  if (checksum(packet) != *(packet + getPacketLength(packet)))
+  if (checksum(packet) != *(packet + getPacketLength(packet) - 1))
   {
     thesis_errn = THESIS_PACKET_CHECKSUM_FAIL;
-    strcpy(thesis_err_msg, "Packet checksum fail.");
+    sprintf(thesis_err_msg, "Packet checksum fail. Recv: %2X. Own: %2X.", 
+           *(packet + getPacketLength(packet) - 1),
+           checksum(packet));
     return thesis_errn;
   }
     

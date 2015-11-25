@@ -86,7 +86,7 @@ int main()
 	USART1_Init(115200);
 	DS1307_Init();
   Sensors_Init();
-  RS485_Init();
+  RS485_Init(115200);
   OutputInit();
   
   if (ThesisInit() == THESIS_FLASH_ERROR)
@@ -99,6 +99,17 @@ int main()
 	RCC_GetClocksFreq(&RCC_Clocks);
   USART1_SendStr("System Clock: ");
   USART1_SendNum(RCC_Clocks.SYSCLK_Frequency);
+  USART1_SendStr("\r\n");
+  
+  
+  USART1_SendStr("Device ID: ");
+  USART1_SendByte(__flash_data.id, HEX);
+  USART1_SendStr("\r\n");
+  USART1_SendStr("Device Unique Number: ");
+  USART1_SendByte(__flash_data.unique_number[0], HEX);
+  USART1_SendByte(__flash_data.unique_number[1], HEX);
+  USART1_SendByte(__flash_data.unique_number[2], HEX);
+  USART1_SendByte(__flash_data.unique_number[3], HEX);
   USART1_SendStr("\r\n");
   
   
@@ -227,7 +238,7 @@ int main()
 			USART1_SendStr("\nUSART1 received packet: \n");
 			RS485_GetData(buff_rs485, rs485_len);
 			for (i = 0; i < rs485_len; i++)
-				USART1_SendByte(buff_usart[i], HEX);
+				USART1_SendByte(buff_rs485[i], HEX);
 			USART1_SendChar('\n');
 			if (ThesisProcess(buff_rs485, rs485_len) == THESIS_OK)
 			{

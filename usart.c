@@ -1,9 +1,11 @@
 #include "usart.h"
 #include <string.h>
 
-#define USART_BUFF_SIZE 50
+#define USART_BUFF_SIZE 128
 unsigned char usart_rx_buff[USART_BUFF_SIZE];
 unsigned char usart_rx_len;
+
+unsigned int break_time = 1000; // default: 1000 us
 
 void USART1_Init(uint32_t baudrate)
 {
@@ -11,6 +13,7 @@ void USART1_Init(uint32_t baudrate)
   USART_InitTypeDef USART_InitStructure;
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 
   /* Configure the NVIC Preemption Priority Bits */  
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
@@ -23,6 +26,8 @@ void USART1_Init(uint32_t baudrate)
   
   /* GPIOD Periph clock enable */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_USART1, ENABLE);
+  /* TIM2 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
    
   /* Configure PA9 and PA10 in output pushpull mode */
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -46,6 +51,21 @@ void USART1_Init(uint32_t baudrate)
   USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
   
   USART_Cmd(USART1, ENABLE);
+  
+  // calculate break_time
+  break_time = 64000000/baudrate;
+  
+  // init timer base
+
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 65535;
+  TIM_TimeBaseStructure.TIM_Prescaler = 64;
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+
+  TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+  /* TIM2 enable counter */
+  TIM_Cmd(TIM2, ENABLE);
 }
 
 
@@ -65,12 +85,16 @@ void USART1_IRQHandler(void)
 //      /* Disable the USARTy Receive interrupt */
 //      USART_ITConfig(USARTy, USART_IT_RXNE, DISABLE);
 //    }
+    TIM_SetCounter(TIM2, 0);
   }
 }
 
 int USART1_Available(void)
 {
-  return usart_rx_len;
+  if (TIM_GetCounter(TIM2) > break_time)
+    return usart_rx_len;
+  else
+    return 0;
 }
 int USART1_GetData(char * buffer, int len)
 {

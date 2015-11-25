@@ -7,6 +7,7 @@
 #define DATA_TYPE_MASK(x) (x & 0x1f)
 #define BIT_ORDER_MASK(x) (x & 0xe0)
 
+#define DATA_TYPE_NULL      0x00
 #define DATA_TYPE_BYTE		  0x01
 #define DATA_TYPE_INT8		  0x02
 #define DATA_TYPE_INT16		  0x03
@@ -18,16 +19,17 @@
 #define DATA_TYPE_FLOAT		  0x09
 #define DATA_TYPE_DOUBLE		0x0A
 
-#define IS_DATA_TYPE_BYTE(x) 	  (DATA_TYPE_MASK(x) == TYPE_BYTE)
-#define IS_DATA_TYPE_INT8(x) 	  (DATA_TYPE_MASK(x) == TYPE_INT8)
-#define IS_DATA_TYPE_INT16(x) 	(DATA_TYPE_MASK(x) == TYPE_INT16)
-#define IS_DATA_TYPE_INT32(x) 	(DATA_TYPE_MASK(x) == TYPE_INT32)
-#define IS_DATA_TYPE_INT64(x) 	(DATA_TYPE_MASK(x) == TYPE_INT64)
-#define IS_DATA_TYPE_UINT16(x) 	(DATA_TYPE_MASK(x) == TYPE_UINT16)
-#define IS_DATA_TYPE_UINT32(x) 	(DATA_TYPE_MASK(x) == TYPE_UINT32)
-#define IS_DATA_TYPE_UINT64(x) 	(DATA_TYPE_MASK(x) == TYPE_UINT64)
-#define IS_DATA_TYPE_FLOAT(x) 	(DATA_TYPE_MASK(x) == TYPE_FLOAT)
-#define IS_DATA_TYPE_DOUBLE(x) 	(DATA_TYPE_MASK(x) == TYPE_DOUBLE)
+#define IS_DATA_TYPE_NULL(x) 	    (DATA_TYPE_MASK(x) == DATA_TYPE_NULL)
+#define IS_DATA_TYPE_BYTE(x) 	  (DATA_TYPE_MASK(x) == DATA_TYPE_BYTE)
+#define IS_DATA_TYPE_INT8(x) 	  (DATA_TYPE_MASK(x) == DATA_TYPE_INT8)
+#define IS_DATA_TYPE_INT16(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_INT16)
+#define IS_DATA_TYPE_INT32(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_INT32)
+#define IS_DATA_TYPE_INT64(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_INT64)
+#define IS_DATA_TYPE_UINT16(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_UINT16)
+#define IS_DATA_TYPE_UINT32(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_UINT32)
+#define IS_DATA_TYPE_UINT64(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_UINT64)
+#define IS_DATA_TYPE_FLOAT(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_FLOAT)
+#define IS_DATA_TYPE_DOUBLE(x) 	(DATA_TYPE_MASK(x) == DATA_TYPE_DOUBLE)
 
 // for my thesis
 #define DATA_TYPE_THESIS_DATA     0x0b
@@ -58,7 +60,7 @@
 #define DEV_SENSOR_TEMPERATURE    0x10
 #define DEV_SENSOR_ULTRA_SONIC    0x20
 #define DEV_SENSOR_GAS            0x30
-#define DEV_SENSOR_LIGTH          0x40
+#define DEV_SENSOR_LIGHT          0x40
 #define DEV_BUZZER                0x50
 #define DEV_SIM900                0x60
 #define DEV_RF                    0x70
@@ -68,13 +70,13 @@
 
 #define IS_SENSOR_TEMPERATURE(x) 	((x & 0xf0) == DEV_SENSOR_TEMPERATURE)
 #define IS_SENSOR_ULTRA_SONIC(x) 	((x & 0xf0) == DEV_SENSOR_ULTRA_SONIC)
-#define IS_SENSOR_GAS(x) 			((x & 0xf0) == DEV_SENSOR_GAS)
-#define IS_SENSOR_LIGTH(x) 			((x & 0xf0) == DEV_SENSOR_LIGTH)
-#define IS_BUZZER(x) 				((x & 0xf0) == DEV_BUZZER)
-#define IS_SIM900(x) 				((x & 0xf0) == DEV_SIM900)
-#define IS_RF(x) 					((x & 0xf0) == DEV_RF)
-#define IS_BLUETOOTH(x) 			((x & 0xf0) == DEV_BLUETOOTH)
-#define IS_MY_THESIS(x) 			((x & 0xf0) == DEV_MY_THESIS)
+#define IS_SENSOR_GAS(x) 			    ((x & 0xf0) == DEV_SENSOR_GAS)
+#define IS_SENSOR_LIGTH(x) 			  ((x & 0xf0) == DEV_SENSOR_LIGTH)
+#define IS_BUZZER(x) 				      ((x & 0xf0) == DEV_BUZZER)
+#define IS_SIM900(x) 				      ((x & 0xf0) == DEV_SIM900)
+#define IS_RF(x) 					        ((x & 0xf0) == DEV_RF)
+#define IS_BLUETOOTH(x) 			    ((x & 0xf0) == DEV_BLUETOOTH)
+#define IS_MY_THESIS(x) 			    ((x & 0xf0) == DEV_MY_THESIS)
 /* devices type */
 
 // default time polling

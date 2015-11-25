@@ -14,7 +14,7 @@ int RS485_CE_ISInActive(void);
 void RS485_DIR_Output(void);
 void RS485_DIR_Input(void);
    
-void RS485_Init(void);
+void RS485_Init(uint32_t baudrate);
 void RS485_SendChar(char c);
 void RS485_SendStr(char Str[]);
 void RS485_SendNum(int num);

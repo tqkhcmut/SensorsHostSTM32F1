@@ -6,6 +6,8 @@
 unsigned char rs485_rx_buff[USART_BUFF_SIZE];
 unsigned char rs485_rx_len;
 
+unsigned int rs485_break_time = 1000; // default: 1000 us
+
 #define RS485     USART3
 
 #define RS485_CE_PIN    GPIO_Pin_13
@@ -36,12 +38,13 @@ void RS485_DIR_Input(void)
   GPIO_WriteBit(RS485_DIR_PORT, RS485_DIR_PIN, Bit_RESET); // OFF
 }
 
-void RS485_Init(void)
+void RS485_Init(uint32_t baudrate)
 {
   // USART init
   USART_InitTypeDef USART_InitStructure;
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   
   /* Enable the USARTy Interrupt */
   NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
@@ -50,6 +53,9 @@ void RS485_Init(void)
   NVIC_Init(&NVIC_InitStructure);
   
   /* GPIOD Periph clock enable */
+  
+  /* TIM3 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
   
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
@@ -78,7 +84,7 @@ void RS485_Init(void)
   GPIO_InitStructure.GPIO_Pin = RS485_DIR_PIN;
   GPIO_Init(RS485_DIR_PORT, &GPIO_InitStructure);
   
-  USART_InitStructure.USART_BaudRate            = 115200;
+  USART_InitStructure.USART_BaudRate            = baudrate;
   USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
   USART_InitStructure.USART_StopBits            = USART_StopBits_1;
   USART_InitStructure.USART_Parity              = USART_Parity_No;
@@ -94,6 +100,21 @@ void RS485_Init(void)
   
   // 
   RS485_DIR_Input();
+  
+  // calculate break_time
+  rs485_break_time = 64000000/baudrate;
+  
+  // init timer base
+
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 65535;
+  TIM_TimeBaseStructure.TIM_Prescaler = 64;
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+
+  TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+  /* TIM3 enable counter */
+  TIM_Cmd(TIM3, ENABLE);
 }
 
 
@@ -113,12 +134,16 @@ void USART3_IRQHandler(void)
 //      /* Disable the USARTy Receive interrupt */
 //      USART_ITConfig(USARTy, USART_IT_RXNE, DISABLE);
 //    }
+    TIM_SetCounter(TIM3, 0);
   }
 }
 
 int RS485_Available(void)
 {
-  return rs485_rx_len;
+  if (TIM_GetCounter(TIM3) > rs485_break_time)
+    return rs485_rx_len;
+  else
+    return 0;
 }
 int RS485_GetData(char * buffer, int len)
 {
