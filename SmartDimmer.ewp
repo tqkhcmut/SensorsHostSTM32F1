@@ -1964,6 +1964,12 @@
   <group>
     <name>SIM900</name>
     <file>
+      <name>$PROJ_DIR$\sim900.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\sim900.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\sim_hal.c</name>
     </file>
     <file>

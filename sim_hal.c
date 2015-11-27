@@ -7,12 +7,15 @@
 unsigned char sim_hal_rx_buff[SIM_HAL_BUFF_SIZE];
 unsigned char sim_hal_rx_len;
 
+unsigned int sim_hal_break_time = 1000; // default: 1000 us
+
 void sim_hal_init(int baudrate)
 {
   // USART init
   USART_InitTypeDef USART_InitStructure;
   GPIO_InitTypeDef GPIO_InitStructure;
   NVIC_InitTypeDef NVIC_InitStructure;
+  TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
 
   /* Configure the NVIC Preemption Priority Bits */  
   NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
@@ -22,6 +25,9 @@ void sim_hal_init(int baudrate)
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+  
+  /* TIM3 clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
   
   /* GPIOD Periph clock enable */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -52,6 +58,21 @@ void sim_hal_init(int baudrate)
   USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
   
   USART_Cmd(USART2, ENABLE);
+  
+  // calculate break_time
+  sim_hal_break_time = 64000000/baudrate;
+  
+  // init timer base
+
+  /* Time base configuration */
+  TIM_TimeBaseStructure.TIM_Period = 65535;
+  TIM_TimeBaseStructure.TIM_Prescaler = 64;
+  TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+
+  TIM_TimeBaseInit(TIM4, &TIM_TimeBaseStructure);
+  /* TIM3 enable counter */
+  TIM_Cmd(TIM4, ENABLE);
 }
 
 
@@ -65,12 +86,16 @@ void USART2_IRQHandler(void)
     {
       sim_hal_rx_len = 0;
     }
+    TIM_SetCounter(TIM4, 0);
   }
 }
 
 int sim_hal_Available(void)
 {
-  return sim_hal_rx_len;
+  if (TIM_GetCounter(TIM4) > sim_hal_break_time)
+    return sim_hal_rx_len;
+  else
+    return 0;
 }
 int sim_hal_GetData(char * buffer, int len)
 {
