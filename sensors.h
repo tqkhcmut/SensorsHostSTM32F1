@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #ifndef SENSORS_DEBUG
-#define SENSORS_DEBUG 1
+#define SENSORS_DEBUG 0
 #endif // SENSORS_DEBUG
 
 struct SensorData

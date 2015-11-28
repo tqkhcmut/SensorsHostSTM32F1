@@ -18,6 +18,8 @@
 #include "rs485.h"
 #include "output.h"
 
+#include "sim900.h"
+
 uint8_t enrf24_addr[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0x0A };
 
 #define BUFFER_SIZE 128
@@ -65,7 +67,7 @@ int main()
 	char buff_usart[BUFFER_SIZE];
 	char buff_rs485[BUFFER_SIZE];
   
-  unsigned int sensors_time_poll = 0, temp_time_poll = 0;
+  unsigned int sensors_time_poll = 0, temp_time_poll = 0, sms_test_time = 0;
   
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -122,60 +124,66 @@ int main()
       Sensors_Poll();
       sensors_time_poll = millis();
 //      buzzer_toggle();
+      
+      Sim900_Process();
     }
-    //    Enrf24_write_buff("Hello world.", 12);
-    //    Enrf24_flush();
     
-		usart_len = USART1_Available();
-		
-		// usart: for test
-		if (usart_len > 4)
-		{
-			int i;
-			USART1_SendStr("\nUSART1 received packet: \n");
-			USART1_GetData(buff_usart, usart_len);
-			for (i = 0; i < usart_len; i++)
-				USART1_SendByte(buff_usart[i], HEX);
-			USART1_SendChar('\n');
-			if (ThesisProcess(buff_usart, usart_len) == THESIS_OK)
-			{
-				memset(buff_usart, 0, usart_len);
-				USART1_Flush();
-				if (thesis_need_to_send)
-				{
-					int i;
-					USART1_SendStr("\nNeed to send packet: ");
-					for (i = 0; i < thesis_msg_len; i++)
-					{
-						USART1_SendByte(thesis_sent_msg[i], HEX);
-					}
-					USART1_SendStr("\nNeed to send packet length: ");
-					USART1_SendNum(thesis_msg_len);
-					USART1_SendStr("\n");
-					thesis_msg_len = 0;
-					thesis_need_to_send = 0;
-				}
-				USART1_SendStr("\nPacket processed.\n"); 
-			}
-			else if (thesis_errn == THESIS_FLASH_ERROR)
-			{
-				USART1_SendStr("\n");
-				USART1_SendStr(thesis_err_msg);
-				USART1_SendStr("\n");
-				led_toggle();
-				for(;;);
-			}
-			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
-			{
-				memset(buff_usart, 0, usart_len);
-				USART1_Flush();
-				USART1_SendStr("Packet processing fail.\n");
-			}
-			
-			USART1_SendStr("\n");
-			USART1_SendStr(thesis_err_msg);
-			USART1_SendStr("\n");
-		}
+    if (millis() - sms_test_time > 10000)
+    {
+      Sim900_SendSMS("Hi kieu", "01677880531");
+      sms_test_time = millis();
+    }
+    
+//		usart_len = USART1_Available();
+//		
+//		// usart: for test
+//		if (usart_len > 4)
+//		{
+//			int i;
+//			USART1_SendStr("\nUSART1 received packet: \n");
+//			USART1_GetData(buff_usart, usart_len);
+//			for (i = 0; i < usart_len; i++)
+//				USART1_SendByte(buff_usart[i], HEX);
+//			USART1_SendChar('\n');
+//			if (ThesisProcess(buff_usart, usart_len) == THESIS_OK)
+//			{
+//				memset(buff_usart, 0, usart_len);
+//				USART1_Flush();
+//				if (thesis_need_to_send)
+//				{
+//					int i;
+//					USART1_SendStr("\nNeed to send packet: ");
+//					for (i = 0; i < thesis_msg_len; i++)
+//					{
+//						USART1_SendByte(thesis_sent_msg[i], HEX);
+//					}
+//					USART1_SendStr("\nNeed to send packet length: ");
+//					USART1_SendNum(thesis_msg_len);
+//					USART1_SendStr("\n");
+//					thesis_msg_len = 0;
+//					thesis_need_to_send = 0;
+//				}
+//				USART1_SendStr("\nPacket processed.\n"); 
+//			}
+//			else if (thesis_errn == THESIS_FLASH_ERROR)
+//			{
+//				USART1_SendStr("\n");
+//				USART1_SendStr(thesis_err_msg);
+//				USART1_SendStr("\n");
+//				led_toggle();
+//				for(;;);
+//			}
+//			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
+//			{
+//				memset(buff_usart, 0, usart_len);
+//				USART1_Flush();
+//				USART1_SendStr("Packet processing fail.\n");
+//			}
+//			
+//			USART1_SendStr("\n");
+//			USART1_SendStr(thesis_err_msg);
+//			USART1_SendStr("\n");
+//		}
 		
     // rf
 		if (Enrf24_available(1))
