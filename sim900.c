@@ -24,9 +24,10 @@ typedef enum SimState
   sim_sms_sending_stage1, // setup charset ok
   sim_sms_sending_stage2, // sms setup ok
   sim_sms_sending_stage3, // sms phone number ok
-  sim_pow_on_stage1,
-  sim_pow_on_stage2,
-  sim_pow_on_stage3,
+  sim_pow_unknown,			// unknown power state
+  sim_pow_turn_on,			// turn on
+  sim_pow_reset,			// reset 
+	sim_plug_test				// test sim insert
 } SimState_t;
 
 int sms_available = 0;
@@ -177,6 +178,14 @@ int Sim900_Process(void)
   switch(sim_curr_state)
   {
   case sim_idle:
+		if (sim900_power_on == 0)
+		{
+			sim_curr_state = sim_pow_unknown;
+		}
+		if (sim900_sim_plug == 0)
+		{
+			sim_curr_state = sim_plug_test;
+		}
     break;
   case sim_wait:
     if (sim_wait_count == 0)
@@ -256,12 +265,36 @@ int Sim900_Process(void)
     sim_next_state = sim_idle;
     sim_wait_count = 30; // 3s
     break;
-  case sim_pow_on_stage1:
+  case sim_pow_unknown:
+		memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
+    sprintf(sim_temp_buff, "AT\r", target_phone);
+#if USE_SIM_HAL
+    sim_hal_sendStr(sim_temp_buff);
+#else
+    USART1_SendStr(sim_temp_buff);
+#endif
+    sim_curr_state = sim_delay;
+    sim_next_state = sim_pow_turn_on;
+    sim_wait_count = 10; // 1s
     break;
-  case sim_pow_on_stage2:
+  case sim_pow_turn_on:
+		if (sim900_power_on == 0)
+		{
+			sim_hal_power_high(); // turn on
+			sim_curr_state = sim_delay;
+			sim_next_state = sim_pow_unknown;
+			sim_wait_count = 10; // 1s
+		}
+		else
+		{
+			sim_curr_state = sim_idle;
+			sim_next_state = sim_idle;
+		}
     break;
-  case sim_pow_on_stage3:
+  case sim_pow_reset:
     break;
+	case sim_plug_test:
+		break;
   default:
     break;
   }
@@ -272,6 +305,8 @@ int Sim900_SendSMS(const char * sms, const char * phone_number)
 {
   if (sim_curr_state != sim_idle)
     return -1;
+	if (sim900_sim_plug == 0) // sim not inserted
+		return -1;
   memset(sms_send_buff, 0, SMS_BUFF_SIZE);
   strcpy(sms_send_buff, sms);
   memset(target_phone, 0, 15);

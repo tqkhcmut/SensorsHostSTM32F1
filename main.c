@@ -89,6 +89,7 @@ int main()
 	DS1307_Init();
   Sensors_Init();
   RS485_Init(115200);
+	sim_hal_init(115200);
   OutputInit();
   
   if (ThesisInit() == THESIS_FLASH_ERROR)

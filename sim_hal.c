@@ -9,6 +9,30 @@ unsigned char sim_hal_rx_len;
 
 unsigned int sim_hal_break_time = 1000; // default: 1000 us
 
+#define SIM_HAL_POW_PORT					GPIOB
+#define SIM_HAL_POW_PIN						GPIO_Pin_5
+#define SIM_HAL_POW_PERIPH_CLK		RCC_APB2Periph_GPIOB
+#define SIM_HAL_RESET_PORT				GPIOB
+#define SIM_HAL_RESET_PIN					GPIO_Pin_4
+#define SIM_HAL_RESET_PERIPH_CLK	RCC_APB2Periph_GPIOB
+
+void sim_hal_power_low(void)
+{
+	GPIO_WriteBit(SIM_HAL_POW_PORT, SIM_HAL_POW_PIN, Bit_RESET);
+}
+void sim_hal_power_high(void)
+{
+	GPIO_WriteBit(SIM_HAL_POW_PORT, SIM_HAL_POW_PIN, Bit_SET);
+}
+void sim_hal_reset_low(void)
+{
+	GPIO_WriteBit(SIM_HAL_RESET_PORT, SIM_HAL_RESET_PIN, Bit_RESET);
+}
+void sim_hal_reset_high(void)
+{
+	GPIO_WriteBit(SIM_HAL_RESET_PORT, SIM_HAL_RESET_PIN, Bit_SET);
+}
+
 void sim_hal_init(int baudrate)
 {
   // USART init
@@ -32,18 +56,29 @@ void sim_hal_init(int baudrate)
   /* GPIOD Periph clock enable */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
-  //RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
+  RCC_APB2PeriphClockCmd(SIM_HAL_POW_PERIPH_CLK, ENABLE);
+  RCC_APB2PeriphClockCmd(SIM_HAL_RESET_PERIPH_CLK, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
   
-  //GPIO_PinRemapConfig(GPIO_PartialRemap_USART3, ENABLE);
+  GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
    
   /* Configure PA2 and PA3 in output pushpull mode */
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
   GPIO_Init(GPIOA, &GPIO_InitStructure);
+	
+	
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_InitStructure.GPIO_Pin = SIM_HAL_POW_PIN;
+  GPIO_Init(SIM_HAL_POW_PORT, &GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin = SIM_HAL_RESET_PIN;
+  GPIO_Init(SIM_HAL_RESET_PORT, &GPIO_InitStructure);
+	
+	sim_hal_reset_low();
   
   USART_InitStructure.USART_BaudRate            = baudrate;
   USART_InitStructure.USART_WordLength          = USART_WordLength_8b;
@@ -90,31 +125,31 @@ void USART2_IRQHandler(void)
   }
 }
 
-int sim_hal_Available(void)
+int sim_hal_available(void)
 {
   if (TIM_GetCounter(TIM4) > sim_hal_break_time)
     return sim_hal_rx_len;
   else
     return 0;
 }
-int sim_hal_GetData(char * buffer, int len)
+int sim_hal_get_data(char * buffer, int len)
 {
   memcpy(buffer, sim_hal_rx_buff, len);
   return len;
 }
-void sim_hal_Flush(void)
+void sim_hal_flush(void)
 {
   sim_hal_rx_len = 0;
 }
 
-void sim_hal_sendChar(char c)
+void sim_hal_send_char(char c)
 {
   USART_SendData(USART2, c);
   while (USART_GetFlagStatus(USART2, USART_FLAG_TC) == RESET)
   {}
 }
 
-void sim_hal_sendStr(char Str[])
+void sim_hal_send_string(char Str[])
 {
   while(*Str)
   {
@@ -124,41 +159,41 @@ void sim_hal_sendStr(char Str[])
   }
 }
 
-void sim_hal_sendNum(int num)
+void sim_hal_send_numberic(int num)
 {
   int tmp = 10000000;
   if (num == 0)
   {
-    sim_hal_sendChar('0');
+    sim_hal_send_char('0');
     return;
   }
   if (num < 0)
   {
-    sim_hal_sendChar('-');
+    sim_hal_send_char('-');
     num = -num;
   }
   while (tmp > 0)
   {
     if (tmp <= num)
     {
-      sim_hal_sendChar((num/tmp)%10 + '0');
+      sim_hal_send_char((num/tmp)%10 + '0');
     }
     tmp = tmp / 10;
   }
 }
 
-void sim_hal_sendFloat(float num)
+void sim_hal_send_float(float num)
 {
   int __int = (int) num;
-  sim_hal_sendNum(__int);
-  sim_hal_sendChar('.');
+  sim_hal_send_numberic(__int);
+  sim_hal_send_char('.');
   __int = (int)((num-__int)*100);
   if (__int < 0)
     __int = 0;
-  sim_hal_sendNum(__int);
+  sim_hal_send_numberic(__int);
 }
 
-void sim_hal_sendByte(uint8_t b, BYTE_FORMAT f)
+void sim_hal_send_byte(uint8_t b, BYTE_FORMAT f)
 {
   uint8_t bitMask = 1;
   uint8_t i;
@@ -167,25 +202,25 @@ void sim_hal_sendByte(uint8_t b, BYTE_FORMAT f)
   case BIN:
     for (i = 8; i > 0; i--)
     {
-      sim_hal_sendChar((b&(bitMask << i)) ? '1' : '0');
+      sim_hal_send_char((b&(bitMask << i)) ? '1' : '0');
     }
     break;
   case OCT:
     break;
   case DEC:
-    sim_hal_sendNum(b);
+    sim_hal_send_numberic(b);
     break;
   case HEX:
     if(b/16 < 10){
-      sim_hal_sendChar(0x30 + b/16);
+      sim_hal_send_char(0x30 + b/16);
     }else{
-      sim_hal_sendChar(0x37 + b/16);
+      sim_hal_send_char(0x37 + b/16);
     }
     
     if(b%16 < 10){
-      sim_hal_sendChar(0x30 + b%16);
+      sim_hal_send_char(0x30 + b%16);
     }else{
-      sim_hal_sendChar(0x37 + b%16);
+      sim_hal_send_char(0x37 + b%16);
     }
     break;
   default:
