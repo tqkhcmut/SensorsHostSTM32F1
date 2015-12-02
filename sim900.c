@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #ifndef USE_SIM_HAL
-#define USE_SIM_HAL 0
+#define USE_SIM_HAL 1
 #endif
 
 #if USE_SIM_HAL
@@ -51,20 +51,19 @@ char sim900_sim_plug = 0;
 int Sim900_Process(void)
 {
 #if USE_SIM_HAL
-  if (sim_hal_Available())
+  if (sim_hal_available())
 #else
   if (USART1_Available())
 #endif
   {
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
 #if USE_SIM_HAL
-    sim_hal_GetData(sim_temp_buff, sim_hal_Available());
-    sim_hal_Flush();
+    sim_hal_get_data(sim_temp_buff, sim_hal_available());
+    sim_hal_flush();
 #else
     USART1_GetData(sim_temp_buff, USART1_Available());
     USART1_Flush();
 #endif
-    RS485_SendStr(sim_temp_buff);
     // process response message here
     // with any response message, it mean power is on 
     sim900_power_on = 1;
@@ -78,40 +77,40 @@ int Sim900_Process(void)
       {
         sim_curr_state = sim_next_state;
       }
-      RS485_SendStr("Got new line\r\n");
+//      RS485_SendStr("Got new line\r\n");
     }
     else if (memcmp("OK", sim_temp_buff, strlen("OK")) == 0)
     {
       // switch to next state
 //      sim_curr_state = sim_next_state;
-      RS485_SendStr("Got OK\r\n");
+//      RS485_SendStr("Got OK\r\n");
     }
     
     // power and sim
     else if (memcmp("NORMAL POWER DOWN", sim_temp_buff, strlen("NORMAL POWER DOWN")) == 0)
     {
       sim900_power_on = 0;
-      RS485_SendStr("Got Power down\r\n");
+//      RS485_SendStr("Got Power down\r\n");
     }
     else if (memcmp("RDY", sim_temp_buff, strlen("RDY")) == 0)
     {
       sim900_power_on = 1;
-      RS485_SendStr("Got RDY\r\n");
+//      RS485_SendStr("Got RDY\r\n");
     }
     else if (memcmp(sim_temp_buff, "+CPIN: READY", strlen("+CPIN: READY")) == 0)
     {
       sim900_sim_plug = 1;
-      RS485_SendStr("Got sim ready\r\n");
+//      RS485_SendStr("Got sim ready\r\n");
     }
     else if (memcmp(sim_temp_buff, "+CPIN: NOT INSERTED", strlen("+CPIN: NOT INSERTED")) == 0)
     {
       sim900_sim_plug = 0;
-      RS485_SendStr("Got sim not insert\r\n");
+//      RS485_SendStr("Got sim not insert\r\n");
     }
     else if (memcmp(sim_temp_buff, "Call Ready", strlen("Call Ready")) == 0)
     {
       //        CallReady = SIM900_CALL_OK;
-      RS485_SendStr("Got call ready\r\n");
+//      RS485_SendStr("Got call ready\r\n");
     }
     
     // SMS
@@ -119,31 +118,31 @@ int Sim900_Process(void)
     else if (memcmp(sim_temp_buff, "AT+CSCS=\"GSM\"", strlen("AT+CSCS=\"GSM\"")) == 0)
     {
       sim_curr_state = sim_next_state;
-      RS485_SendStr("Got AT+CSCS=\"GSM\"\r\n");
+//      RS485_SendStr("Got AT+CSCS=\"GSM\"\r\n");
     }
     // sms not setup
     else if (memcmp(sim_temp_buff, "+CMS ERROR: operation not allowed", strlen("+CMS ERROR: operation not allowed")) == 0)
     {
       sim_curr_state = sim_idle;
-      RS485_SendStr("Got +CMS ERROR: operation not allowed\r\n");
+//      RS485_SendStr("Got +CMS ERROR: operation not allowed\r\n");
     }
     // sms setup ok
     else if (memcmp(sim_temp_buff, "AT+CMGF=1", strlen("AT+CMGF=1")) == 0)
     {
       sim_curr_state = sim_next_state;
-      RS485_SendStr("Got AT+CMGF=1\r\n");
+//      RS485_SendStr("Got AT+CMGF=1\r\n");
     }
     // send number ok
     else if (memcmp(sim_temp_buff, "AT+CMGS=\"", strlen("AT+CMGS=\"")) == 0)
     {
       sim_curr_state = sim_next_state;
-      RS485_SendStr("Got AT+CMGS=\"\r\n");
+//      RS485_SendStr("Got AT+CMGS=\"\r\n");
     }
     // send sms done
     else if (memcmp(sim_temp_buff, "+CMGS: ", strlen("+CMGS: ")) == 0)
     {
       sim_curr_state = sim_next_state;
-      RS485_SendStr("Got +CMGS: \r\n");
+//      RS485_SendStr("Got +CMGS: \r\n");
     }
 //    // new sms coming
 //    else if (memcmp(sim_temp_buff, "+CMTI: \"SM\",", strlen("+CMTI: \"SM\",")) == 0)
@@ -171,7 +170,7 @@ int Sim900_Process(void)
 //    }
     else
     {
-      RS485_SendStr("Not processed\r\n");
+//      RS485_SendStr("Not processed\r\n");
     }
   }
   
@@ -221,7 +220,7 @@ int Sim900_Process(void)
     break;
   case sim_sms_sending: // setup charset
 #if USE_SIM_HAL
-    sim_hal_sendStr("AT+CSCS=\"GSM\"\r");
+    sim_hal_send_string("AT+CSCS=\"GSM\"\r");
 #else
     USART1_SendStr("AT+CSCS=\"GSM\"\r");
 #endif
@@ -231,7 +230,7 @@ int Sim900_Process(void)
     break;
   case sim_sms_sending_stage1: // charset ok, setup sms
 #if USE_SIM_HAL
-    sim_hal_sendStr("AT+CMGF=1\r");
+    sim_hal_send_string("AT+CMGF=1\r");
 #else
     USART1_SendStr("AT+CMGF=1\r");
 #endif
@@ -243,7 +242,7 @@ int Sim900_Process(void)
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
     sprintf(sim_temp_buff, "AT+CMGS=\"%s\"\r", target_phone);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
+    sim_hal_send_string(sim_temp_buff);
 #else
     USART1_SendStr(sim_temp_buff);
 #endif
@@ -255,8 +254,8 @@ int Sim900_Process(void)
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
     strcpy(sim_temp_buff, sms_send_buff);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
-    sim_hal_sendChar(0x1a);
+    sim_hal_send_string(sim_temp_buff);
+    sim_hal_send_char(0x1a);
 #else
     USART1_SendStr(sim_temp_buff);
     USART1_SendChar(0x1a);
@@ -267,11 +266,11 @@ int Sim900_Process(void)
     break;
   case sim_pow_unknown:
 		memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
-    sprintf(sim_temp_buff, "AT\r", target_phone);
+//    sprintf(sim_temp_buff, "AT\r", target_phone);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
+    sim_hal_send_string("AT\r");
 #else
-    USART1_SendStr(sim_temp_buff);
+    USART1_SendStr("AT\r");
 #endif
     sim_curr_state = sim_delay;
     sim_next_state = sim_pow_turn_on;
@@ -280,7 +279,10 @@ int Sim900_Process(void)
   case sim_pow_turn_on:
 		if (sim900_power_on == 0)
 		{
+#if USE_SIM_HAL
 			sim_hal_power_high(); // turn on
+#else
+#endif
 			sim_curr_state = sim_delay;
 			sim_next_state = sim_pow_unknown;
 			sim_wait_count = 10; // 1s
