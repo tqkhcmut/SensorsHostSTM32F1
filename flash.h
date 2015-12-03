@@ -15,6 +15,7 @@ struct FlashData
   uint8_t id;
   uint8_t unique_number[4];
   struct Thesis _thesis;
+  uint16_t random_number; 
 };
 
 extern const char InvalidUniqueNumber[];

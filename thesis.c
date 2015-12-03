@@ -64,6 +64,7 @@ int ThesisInit(void)
     memset(__flash_data._thesis._sim.tar_num, 0, 13);
     memcpy(__flash_data._thesis._sim.tar_num, Default_tar_num, strlen(Default_tar_num));
     __flash_data._thesis._sim.tar_num_len = Default_tar_num_len;
+    __flash_data.random_number = RDN(__flash_data.id);
   }
   
   if (flash_write_buffer((char*)&__flash_data, sizeof(__flash_data)) != 0)

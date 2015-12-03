@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #ifndef USE_SIM_HAL
-#define USE_SIM_HAL 0
+#define USE_SIM_HAL 1
 #endif
 
 #if USE_SIM_HAL
@@ -51,15 +51,15 @@ char sim900_sim_plug = 0;
 int Sim900_Process(void)
 {
 #if USE_SIM_HAL
-  if (sim_hal_Available())
+  if (sim_hal_available())
 #else
   if (USART1_Available())
 #endif
   {
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
 #if USE_SIM_HAL
-    sim_hal_GetData(sim_temp_buff, sim_hal_Available());
-    sim_hal_Flush();
+    sim_hal_get_data(sim_temp_buff, sim_hal_available());
+    sim_hal_flush();
 #else
     USART1_GetData(sim_temp_buff, USART1_Available());
     USART1_Flush();
@@ -221,7 +221,7 @@ int Sim900_Process(void)
     break;
   case sim_sms_sending: // setup charset
 #if USE_SIM_HAL
-    sim_hal_sendStr("AT+CSCS=\"GSM\"\r");
+    sim_hal_send_string("AT+CSCS=\"GSM\"\r");
 #else
     USART1_SendStr("AT+CSCS=\"GSM\"\r");
 #endif
@@ -231,7 +231,7 @@ int Sim900_Process(void)
     break;
   case sim_sms_sending_stage1: // charset ok, setup sms
 #if USE_SIM_HAL
-    sim_hal_sendStr("AT+CMGF=1\r");
+    sim_hal_send_string("AT+CMGF=1\r");
 #else
     USART1_SendStr("AT+CMGF=1\r");
 #endif
@@ -243,7 +243,7 @@ int Sim900_Process(void)
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
     sprintf(sim_temp_buff, "AT+CMGS=\"%s\"\r", target_phone);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
+    sim_hal_send_string(sim_temp_buff);
 #else
     USART1_SendStr(sim_temp_buff);
 #endif
@@ -255,8 +255,8 @@ int Sim900_Process(void)
     memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
     strcpy(sim_temp_buff, sms_send_buff);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
-    sim_hal_sendChar(0x1a);
+    sim_hal_send_string(sim_temp_buff);
+    sim_hal_send_char(0x1a);
 #else
     USART1_SendStr(sim_temp_buff);
     USART1_SendChar(0x1a);
@@ -267,11 +267,10 @@ int Sim900_Process(void)
     break;
   case sim_pow_unknown:
 		memset(sim_temp_buff, 0, SMS_BUFF_SIZE);
-    sprintf(sim_temp_buff, "AT\r", target_phone);
 #if USE_SIM_HAL
-    sim_hal_sendStr(sim_temp_buff);
+    sim_hal_send_string("AT\r");
 #else
-    USART1_SendStr(sim_temp_buff);
+    USART1_SendStr("AT\r");
 #endif
     sim_curr_state = sim_delay;
     sim_next_state = sim_pow_turn_on;
