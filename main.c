@@ -199,7 +199,6 @@ int main()
 			if (ThesisProcess(buff_rf, rf_len) == THESIS_OK)
 			{
 				memset(buff_rf, 0, rf_len);
-//				RF_Flush();
         rf_len = 0;
 				if (thesis_need_to_send)
 				{
@@ -207,9 +206,11 @@ int main()
 					USART1_SendStr("\nNeed to send packet: ");
 					for (i = 0; i < thesis_msg_len; i++)
 					{
-						Enrf24_write(thesis_sent_msg[i]);
+//						Enrf24_write(thesis_sent_msg[i]);
 						USART1_SendByte(thesis_sent_msg[i], HEX);
 					}
+          Enrf24_write_buff(thesis_sent_msg, thesis_msg_len);
+          Enrf24_flush();
 					USART1_SendStr("\nNeed to send packet length: ");
 					USART1_SendNum(thesis_msg_len);
 					USART1_SendStr("\n");
