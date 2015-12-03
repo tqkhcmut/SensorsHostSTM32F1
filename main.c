@@ -239,58 +239,58 @@ int main()
 			USART1_SendStr("\n");
 		}
     
-//    // rs485
-//		rs485_len = RS485_Available();
-//		if (rs485_len > 4)
-//		{
-//			int i;
-//			USART1_SendStr("\nUSART1 received packet: \n");
-//			RS485_GetData(buff_rs485, rs485_len);
-//			for (i = 0; i < rs485_len; i++)
-//				USART1_SendByte(buff_rs485[i], HEX);
-//			USART1_SendChar('\n');
-//			if (ThesisProcess(buff_rs485, rs485_len) == THESIS_OK)
-//			{
-//				memset(buff_rs485, 0, rs485_len);
-//				RS485_Flush();
-//				if (thesis_need_to_send)
-//				{
-//					int i;
-//					USART1_SendStr("\nNeed to send packet: ");
-//          RS485_DIR_Output();
-//					for (i = 0; i < thesis_msg_len; i++)
-//					{
-//						RS485_SendChar(thesis_sent_msg[i]);
-//						USART1_SendByte(thesis_sent_msg[i], HEX);
-//					}
-//          RS485_DIR_Input();
-//					USART1_SendStr("\nNeed to send packet length: ");
-//					USART1_SendNum(thesis_msg_len);
-//					USART1_SendStr("\n");
-//					thesis_msg_len = 0;
-//					thesis_need_to_send = 0;
-//				}
-//				USART1_SendStr("\nPacket processed.\n"); 
-//			}
-//			else if (thesis_errn == THESIS_FLASH_ERROR)
-//			{
-//				USART1_SendStr("\n");
-//				USART1_SendStr(thesis_err_msg);
-//				USART1_SendStr("\n");
-//				led_toggle();
-//				for(;;);
-//			}
-//			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
-//			{
-//				memset(buff_rs485, 0, rs485_len);
-//				RS485_Flush();
-//				USART1_SendStr("Packet processing fail.\n");
-//			}
-//			
-//			USART1_SendStr("\n");
-//			USART1_SendStr(thesis_err_msg);
-//			USART1_SendStr("\n");
-//		}
+    // rs485
+		rs485_len = RS485_Available();
+		if (rs485_len > 4)
+		{
+			int i;
+			USART1_SendStr("\nUSART1 received packet: \n");
+			RS485_GetData(buff_rs485, rs485_len);
+			for (i = 0; i < rs485_len; i++)
+				USART1_SendByte(buff_rs485[i], HEX);
+			USART1_SendChar('\n');
+			if (ThesisProcess(buff_rs485, rs485_len) == THESIS_OK)
+			{
+				memset(buff_rs485, 0, rs485_len);
+				RS485_Flush();
+				if (thesis_need_to_send)
+				{
+					int i;
+					USART1_SendStr("\nNeed to send packet: ");
+          RS485_DIR_Output();
+					for (i = 0; i < thesis_msg_len; i++)
+					{
+						RS485_SendChar(thesis_sent_msg[i]);
+						USART1_SendByte(thesis_sent_msg[i], HEX);
+					}
+          RS485_DIR_Input();
+					USART1_SendStr("\nNeed to send packet length: ");
+					USART1_SendNum(thesis_msg_len);
+					USART1_SendStr("\n");
+					thesis_msg_len = 0;
+					thesis_need_to_send = 0;
+				}
+				USART1_SendStr("\nPacket processed.\n"); 
+			}
+			else if (thesis_errn == THESIS_FLASH_ERROR)
+			{
+				USART1_SendStr("\n");
+				USART1_SendStr(thesis_err_msg);
+				USART1_SendStr("\n");
+				led_toggle();
+				for(;;);
+			}
+			else if (thesis_errn != THESIS_PACKET_NOT_ENOUGH_LENGTH)
+			{
+				memset(buff_rs485, 0, rs485_len);
+				RS485_Flush();
+				USART1_SendStr("Packet processing fail.\n");
+			}
+			
+			USART1_SendStr("\n");
+			USART1_SendStr(thesis_err_msg);
+			USART1_SendStr("\n");
+		}
     
 	}
 	
