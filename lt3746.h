@@ -3,6 +3,10 @@
 
 #include <stdint.h>
 
+#ifndef LT3746_DELAY
+#define LT3746_DELAY 0
+#endif
+
 /* led enable */
 #define LED_CHANNELS_ENABLE   1
 #define LED_CHANNELS_DISABLE  0
@@ -33,7 +37,8 @@ struct LT3746_Frame
 };
 
 int LT3746_Init(LT3746_Mode_t mode);
-int LT3746_Transfer(struct LT3746_Frame * frame);
+int LT3746_Transfer(struct LT3746_Frame * frame, char latch);
+//int LT3746_Latch(void);
 int LT3746_GetLedStatus(struct LT3746_Frame frame, uint8_t led_number);
 
 #endif // _lt3746_h_

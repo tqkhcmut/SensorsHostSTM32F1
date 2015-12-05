@@ -1890,6 +1890,24 @@
     </settings>
   </configuration>
   <group>
+    <name>ADE7759</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
+    <file>
+      <name>$PROJ_DIR$\ade7759.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ade7759.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ade7759_spi.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\ade7759_spi.h</name>
+    </file>
+  </group>
+  <group>
     <name>Delay</name>
     <file>
       <name>$PROJ_DIR$\delay.c</name>
@@ -1905,6 +1923,21 @@
     </file>
     <file>
       <name>$PROJ_DIR$\ds1307.h</name>
+    </file>
+  </group>
+  <group>
+    <name>LT3746</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
+    <file>
+      <name>$PROJ_DIR$\lt3746.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lt3746.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\lt3746_test.c</name>
     </file>
   </group>
   <group>
