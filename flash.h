@@ -23,9 +23,9 @@ extern const char Default_UniqueNumber[];
 extern const char Default_id[];
 
 
-#define Default_TempC    0
-#define Default_Gas      0
-#define Default_Lighting 0
+#define Default_TempC    50
+#define Default_Gas      2048
+#define Default_Lighting 100
 
 #define Default_Buzzer   1
 #define Default_Speaker  1

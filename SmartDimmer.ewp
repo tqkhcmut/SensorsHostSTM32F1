@@ -1941,6 +1941,15 @@
     </file>
   </group>
   <group>
+    <name>Output</name>
+    <file>
+      <name>$PROJ_DIR$\output.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\output.h</name>
+    </file>
+  </group>
+  <group>
     <name>RFTranceiver</name>
     <file>
       <name>$PROJ_DIR$\enrf24.c</name>
@@ -2197,12 +2206,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\main.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\output.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\output.h</name>
   </file>
 </project>
 

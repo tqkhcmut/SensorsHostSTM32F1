@@ -2,6 +2,7 @@
 #include "packet.h"
 #include "flash.h"
 #include "sensors.h"
+#include "output.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -175,9 +176,13 @@ int ThesisProcess(char * packet, int len)
         break;
       }
     case CMD_TYPE_CONTROL:
-      thesis_errn = THESIS_CMD_NOT_SUPPORT;
-      strcpy(thesis_err_msg, "Command not support.");
-      break;
+      {
+        struct ThesisData * _data = (struct ThesisData *)_packet->data;
+        __flash_data._thesis._data.Gas = _data->Gas;
+        __flash_data._thesis._data.Lighting = _data->Lighting;
+        __flash_data._thesis._data.TempC = _data->TempC;
+        break;
+      }
     default:
       break;
     }
