@@ -1891,9 +1891,6 @@
   </configuration>
   <group>
     <name>ADE7759</name>
-    <excluded>
-      <configuration>Debug</configuration>
-    </excluded>
     <file>
       <name>$PROJ_DIR$\ade7759.c</name>
     </file>
@@ -2206,6 +2203,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\main.c</name>
+    <excluded>
+      <configuration>Debug</configuration>
+    </excluded>
   </file>
 </project>
 

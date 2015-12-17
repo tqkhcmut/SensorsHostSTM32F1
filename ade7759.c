@@ -1,10 +1,10 @@
 #include "ade7759.h"
 
-u8  ade7759_tx[ADE7759_MAX_TX];
-u8  ade7759_rx[ADE7759_MAX_RX];
+uint8_t  ade7759_tx[ADE7759_MAX_TX];
+uint8_t  ade7759_rx[ADE7759_MAX_RX];
 
-static int ade7759_spi_write_reg_8(u8 reg_address,
-                                   u8 val)
+static int ade7759_spi_write_reg_8(uint8_t reg_address,
+                                   uint8_t val)
 {
   int ret;
   ade7759_tx[0] = ADE7759_WRITE_REG(reg_address);
@@ -14,8 +14,8 @@ static int ade7759_spi_write_reg_8(u8 reg_address,
   return ret;
 }
 
-static int ade7759_spi_write_reg_16(u8 reg_address,
-                                    u16 value)
+static int ade7759_spi_write_reg_16(uint8_t reg_address,
+                                    uint16_t value)
 {
   int ret;
   ade7759_tx[0] = ADE7759_WRITE_REG(reg_address);
@@ -25,8 +25,8 @@ static int ade7759_spi_write_reg_16(u8 reg_address,
   return ret;
 }
 
-static int ade7759_spi_read_reg_8(u8 reg_address,
-                                  u8 *val)
+static int ade7759_spi_read_reg_8(uint8_t reg_address,
+                                  uint8_t *val)
 {
   int ret;
   
@@ -40,8 +40,8 @@ static int ade7759_spi_read_reg_8(u8 reg_address,
   return 0;
 }
 
-static int ade7759_spi_read_reg_16(u8 reg_address,
-                                   u16 *val)
+static int ade7759_spi_read_reg_16(uint8_t reg_address,
+                                   uint16_t *val)
 {
   int ret;
   
@@ -58,8 +58,8 @@ static int ade7759_spi_read_reg_16(u8 reg_address,
   return 0;
 }
 
-static int ade7759_spi_read_reg_40(u8 reg_address,
-                                   u64 *val)
+static int ade7759_spi_read_reg_40(uint8_t reg_address,
+                                   uint64_t *val)
 {
   struct spi_message msg;
   struct iio_dev *indio_dev = dev_get_drvdata(dev);
@@ -97,7 +97,7 @@ error_ret:
 int ade7759_reset(void)
 {
   int ret;
-  u16 val;
+  uint16_t val;
   ade7759_spi_read_reg_16(ADE7759_MODE,
                           &val);
   val |= 1 << 6; /* Software Chip Reset */
@@ -121,10 +121,10 @@ int ade7759_write_reset(const char *buf, size_t len)
 }
 
 
-int ade7759_set_irq(u8 enable)
+int ade7759_set_irq(uint8_t enable)
 {
   int ret;
-  u8 irqen;
+  uint8_t irqen;
   ret = ade7759_spi_read_reg_8(ADE7759_IRQEN, &irqen);
   if (ret)
     goto error_ret;
@@ -144,7 +144,7 @@ error_ret:
 /* Power down the device */
 int ade7759_stop_device(void)
 {
-  u16 val;
+  uint16_t val;
   
   ade7759_spi_read_reg_16(ADE7759_MODE,
                           &val);
@@ -177,7 +177,7 @@ err_ret:
 static ssize_t ade7759_read_frequency(char *buf)
 {
   int ret;
-  u16 t;
+  uint16_t t;
   int sps;
   ret = ade7759_spi_read_reg_16(ADE7759_MODE,
                                 &t);
@@ -195,7 +195,7 @@ int ade7759_write_frequency(const char *buf,
 {
   unsigned long val;
   int ret;
-  u16 reg, t;
+  uint16_t reg, t;
   
   ret = strict_strtol(buf, 10, &val); // convert to number
   if (ret)
