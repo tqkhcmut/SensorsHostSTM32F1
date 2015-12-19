@@ -77,6 +77,7 @@ int ThesisInit(void)
 
 int ThesisProcess(char * packet, int len)
 {
+  uint8_t test_unique[4] = {0, 0, 0, 2};
   thesis_errn = THESIS_OK;
   memset(thesis_err_msg, 0, THESIS_MSG_SIZE);
   
@@ -114,7 +115,8 @@ int ThesisProcess(char * packet, int len)
     return thesis_errn;
   }
   
-  if (memcmp(_packet->unique_number, __flash_data.unique_number, 4) != 0)
+//  if (memcmp(_packet->unique_number, __flash_data.unique_number, 4) != 0)
+  if (memcmp(_packet->unique_number, test_unique, 4) != 0)
   {
     thesis_errn = THESIS_INVALID_UNIQUE_NUMBER;
     strcpy(thesis_err_msg, "Invalid unique number.");
