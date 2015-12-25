@@ -44,6 +44,9 @@ uint8_t LastDeviceFlag;
 
 void OneWire_Init(void)
 {
+//	// old pcb
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	// new pcb
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
   
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;

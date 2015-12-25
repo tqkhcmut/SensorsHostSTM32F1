@@ -77,7 +77,7 @@ int ThesisInit(void)
 
 int ThesisProcess(char * packet, int len)
 {
-  uint8_t test_unique[4] = {0, 0, 0, 2};
+  uint8_t test_unique[4] = {0, 0, 0, 1};
   thesis_errn = THESIS_OK;
   memset(thesis_err_msg, 0, THESIS_MSG_SIZE);
   

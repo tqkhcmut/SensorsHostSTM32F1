@@ -42,8 +42,14 @@
 #define FALSE 0
 #define TRUE  1
 
+//// old
+//#define ONEWIRE_PORT					GPIOB
+//#define ONEWIRE_PIN						GPIO_Pin_8
+
+// new
 #define ONEWIRE_PORT					GPIOA
 #define ONEWIRE_PIN						GPIO_Pin_1
+
 #define ONEWIRE_OUTPUT_MODE		GPIO_Mode_Out_PP
 #define ONEWIRE_INPUT_MODE		GPIO_Mode_IN_FLOATING
 

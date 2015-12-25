@@ -125,15 +125,42 @@ int main()
       Sensors_Poll();
       sensors_time_poll = millis();
 //      buzzer_toggle();
+			if (sensors.Gas >= 1500)
+			{
+				USART1_SendFloat(sensors.Gas);
+				TurnBuzzerOn();
+				TurnSpeakerOn();
+				TurnRelayOn();
+			}
+			else if (sensors.Lighting >= 100)
+			{
+				USART1_SendFloat(sensors.Lighting);
+				TurnBuzzerOn();
+				TurnSpeakerOn();
+				TurnRelayOn();
+			}
+			else if (sensors.TempC >= 40)
+			{
+				USART1_SendFloat(sensors.TempC);
+				TurnBuzzerOn();
+				TurnSpeakerOn();
+				TurnRelayOn();
+			}
+			else
+			{
+				TurnBuzzerOff();
+				TurnSpeakerOff();
+				TurnRelayOff();
+			}
       
-      Sim900_Process();
+//      Sim900_Process();
     }
     
-    if (millis() - sms_test_time > 10000)
-    {
-      Sim900_SendSMS("Hi kieu", "01677880531");
-      sms_test_time = millis();
-    }
+//    if (millis() - sms_test_time > 10000)
+//    {
+//      Sim900_SendSMS("Hi kieu", "01677880531");
+//      sms_test_time = millis();
+//    }
     
 //		usart_len = USART1_Available();
 //		
