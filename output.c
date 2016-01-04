@@ -13,7 +13,18 @@ void OutputInit(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-//  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, DISABLE);
+  /* Enable PWR and BKP clocks */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+
+  /* Allow access to BKP Domain */
+  PWR_BackupAccessCmd(ENABLE);
+
+  /* Reset Backup Domain */
+  BKP_DeInit();
+
+  /* Enable LSE */
+  RCC_LSEConfig(RCC_LSE_OFF);
+  
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
   
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;

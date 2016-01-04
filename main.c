@@ -54,6 +54,25 @@ void buzzer_toggle(void)
   }
 }
 
+uint8_t output_state = 0;
+void output_toggle(void)
+{
+  if (output_state)
+  {
+    TurnBuzzerOff();
+    TurnSpeakerOff();
+    TurnRelayOff();
+    output_state = 0;
+  }
+  else
+  {
+    TurnBuzzerOn();
+    TurnSpeakerOn();
+    TurnRelayOn();
+    output_state = 1;
+  }
+}
+
 #define BUFFER_SIZE 128
 
 int main()
@@ -125,6 +144,7 @@ int main()
       Sensors_Poll();
       sensors_time_poll = millis();
 //      buzzer_toggle();
+      output_toggle();
 			if (sensors.Gas >= 1500)
 			{
 				USART1_SendFloat(sensors.Gas);

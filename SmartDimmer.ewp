@@ -1907,6 +1907,9 @@
     <file>
       <name>$PROJ_DIR$\ade7759_spi.h</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\ade7759_test.c</name>
+    </file>
   </group>
   <group>
     <name>Delay</name>
