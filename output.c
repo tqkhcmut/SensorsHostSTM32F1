@@ -43,14 +43,17 @@ void OutputInit(void)
 	TurnSpeakerOff();
 	TurnRelayOff();
 }
-unsigned char buzzer_status = 0;
-unsigned char speaker_status = 0;
-unsigned char relay_status = 0;
+unsigned char buzzer_status = 1;
+unsigned char speaker_status = 1;
+unsigned char relay_status = 1;
 
 void TurnBuzzerOn(void)
 {
-	GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_RESET); // OFF
-	buzzer_status = 1;
+	if (buzzer_status == 0)
+	{
+    GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_RESET); // OFF
+    buzzer_status = 1;
+  }
 }
                                                                                                                                                                                                                                                                                       
 void TurnBuzzerOff(void)
@@ -58,14 +61,17 @@ void TurnBuzzerOff(void)
 	if (buzzer_status == 1)
 	{
   	GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_SET); // OFF
-		speaker_status = 0;
+		buzzer_status = 0;
 	}
 }
 
 void TurnSpeakerOn(void)
 {
-	GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_RESET); // OFF
-	speaker_status = 1;
+	if (speaker_status == 0)
+	{
+    GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_RESET); // OFF
+    speaker_status = 1;
+  }
 }
 void TurnSpeakerOff(void)
 {
@@ -78,14 +84,17 @@ void TurnSpeakerOff(void)
 
 void TurnRelayOn(void)
 {
+	if (relay_status == 0)
+	{
   	GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_RESET); // OFF
-	speaker_status = 1;
+    relay_status = 1;
+  }
 }
 void TurnRelayOff(void)
 {
-	if (speaker_status == 1)
+	if (relay_status == 1)
 	{
 		GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_SET); // OFF
-		speaker_status = 0;
+		relay_status = 0;
 	}
 }
