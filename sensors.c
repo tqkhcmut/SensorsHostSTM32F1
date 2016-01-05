@@ -2,8 +2,9 @@
 #include "one_wire.h"
 
 #include "stm32f10x.h"
-
+#if DEBUG
 #include "usart.h"
+#endif
 #include "flash.h"
 #include "output.h"
 
@@ -118,45 +119,45 @@ void Sensors_Poll(void)
 {
   /* This function must be call 100 ms periods */
   
-  // check warning level
-  if (sensors.Gas > __flash_data._thesis._data.Gas || 
-      sensors.Lighting > __flash_data._thesis._data.Lighting || 
-        sensors.TempC > __flash_data._thesis._data.TempC)
-  {
-    // turn on buzzer if enable
-    if (__flash_data._thesis._output.Buzzer)
-    {
-      TurnBuzzerOn();
-    }
-    // turn on speaker if enable
-    if (__flash_data._thesis._output.Speaker)
-    {
-      TurnSpeakerOn();
-    }
-    // turn on relay if enable
-    if (__flash_data._thesis._output.Relay)
-    {
-      TurnRelayOn();
-    }
-  }
-  else
-  {
-    // turn off buzzer if enable
-    if (__flash_data._thesis._output.Buzzer)
-    {
-      TurnBuzzerOff();
-    }
-    // turn off speaker if enable
-    if (__flash_data._thesis._output.Speaker)
-    {
-      TurnSpeakerOff();
-    }
-    // turn off relay if enable
-    if (__flash_data._thesis._output.Relay)
-    {
-      TurnRelayOff();
-    }
-  }
+//  // check warning level
+//  if (sensors.Gas > __flash_data._thesis._data.Gas || 
+//      sensors.Lighting > __flash_data._thesis._data.Lighting || 
+//        sensors.TempC > __flash_data._thesis._data.TempC)
+//  {
+//    // turn on buzzer if enable
+//    if (__flash_data._thesis._output.Buzzer)
+//    {
+//      TurnBuzzerOn();
+//    }
+//    // turn on speaker if enable
+//    if (__flash_data._thesis._output.Speaker)
+//    {
+//      TurnSpeakerOn();
+//    }
+//    // turn on relay if enable
+//    if (__flash_data._thesis._output.Relay)
+//    {
+//      TurnRelayOn();
+//    }
+//  }
+//  else
+//  {
+//    // turn off buzzer if enable
+//    if (__flash_data._thesis._output.Buzzer)
+//    {
+//      TurnBuzzerOff();
+//    }
+//    // turn off speaker if enable
+//    if (__flash_data._thesis._output.Speaker)
+//    {
+//      TurnSpeakerOff();
+//    }
+//    // turn off relay if enable
+//    if (__flash_data._thesis._output.Relay)
+//    {
+//      TurnRelayOff();
+//    }
+//  }
   
   // recalculate sensor values
   sensors.Gas = (ADCConvertedValue[0] + ADCConvertedValue[2] + ADCConvertedValue[4])/3;
