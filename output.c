@@ -13,8 +13,15 @@ void OutputInit(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
   
-//  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, DISABLE);
+	/* PWR and BKP Periph clock enable */
+  RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
+ 
+  /* GPIOC Periph clock enable */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+ 
+  PWR_BackupAccessCmd(ENABLE);
+ 
+  RCC_LSEConfig(RCC_LSE_OFF); // Disable LSE - PC14 PC15 as GPIO 
   
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -27,7 +34,7 @@ void OutputInit(void)
   
   GPIO_InitStructure.GPIO_Pin = RELAY_PIN;
   GPIO_Init(RELAY_PORT, &GPIO_InitStructure);
-	
+		
 	TurnBuzzerOff();
 	TurnSpeakerOff();
 	TurnRelayOff();
