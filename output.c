@@ -55,7 +55,11 @@ void TurnBuzzerOn(void)
 {
 	if (buzzer_status == 0)
 	{
+#if OLD_PCB
+  	GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_SET); // OFF
+#else
     GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_RESET); // OFF
+#endif
     buzzer_status = 1;
   }
 }
@@ -64,7 +68,11 @@ void TurnBuzzerOff(void)
 {
 	if (buzzer_status == 1)
 	{
+#if OLD_PCB
+    GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_RESET); // OFF
+#else
   	GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, Bit_SET); // OFF
+#endif
 		buzzer_status = 0;
 	}
 }
@@ -73,7 +81,11 @@ void TurnSpeakerOn(void)
 {
 	if (speaker_status == 0)
 	{
+#if OLD_PCB
+		GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_SET); // OFF
+#else
     GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_RESET); // OFF
+#endif
     speaker_status = 1;
   }
 }
@@ -81,7 +93,11 @@ void TurnSpeakerOff(void)
 {
 	if (speaker_status == 1)
 	{
+#if OLD_PCB
+    GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_RESET); // OFF
+#else
 		GPIO_WriteBit(SPEAKER_PORT, SPEAKER_PIN, Bit_SET); // OFF
+#endif
 		speaker_status = 0;
 	}
 }
@@ -90,7 +106,11 @@ void TurnRelayOn(void)
 {
 	if (relay_status == 0)
 	{
+#if OLD_PCB
+		GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_SET); // OFF
+#else
   	GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_RESET); // OFF
+#endif
     relay_status = 1;
   }
 }
@@ -98,7 +118,11 @@ void TurnRelayOff(void)
 {
 	if (relay_status == 1)
 	{
+#if OLD_PCB
+  	GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_RESET); // OFF
+#else
 		GPIO_WriteBit(RELAY_PORT, RELAY_PIN, Bit_SET); // OFF
+#endif
 		relay_status = 0;
 	}
 }
